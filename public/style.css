@@ -1,0 +1,72 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+}
+
+#game-container {
+    max-width: 600px;
+    margin: auto;
+}
+
+#board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 5px;
+    margin: 20px auto;
+    width: 300px;
+}
+
+.cell {
+    background: #f4f4f4;
+    border: 1px solid #ccc;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2em;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.cell:hover {
+    background: #e0e0e0;
+}
+
+.cell.winning-cell {
+    background: #4caf50;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+#chat {
+    margin-top: 20px;
+}
+
+#messages {
+    list-style: none;
+    max-height: 150px;
+    overflow-y: auto;
+    padding: 0;
+    border: 1px solid #ccc;
+}
+
+#chat-input {
+    width: 70%;
+    padding: 5px;
+}
+
+#send-btn {
+    padding: 5px 10px;
+}
