@@ -28,7 +28,15 @@ To run the Tic-Tac-Toe game locally, follow these steps:
     npm install
     ```
 
-4. **Find your IPv4 address:**
+4. **Generate a self-signed SSL certificate and key using OpenSSL:**
+
+    ```sh
+    openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365
+    ```
+
+    Follow the prompts to complete the process. This will generate `key.pem` and `cert.pem` files.
+
+5. **Find your IPv4 address:**
     - Open Command Prompt and run:
 
     ```sh
@@ -37,14 +45,18 @@ To run the Tic-Tac-Toe game locally, follow these steps:
 
     - Look for the "IPv4 Address" under your network connection.
 
-5. **Run the server:**
+6. **Run the server:**
 
     ```sh
     npm start
     ```
 
-6. **Connect to the game:**
-    - Open your web browser and navigate to `http://<your-ipv4-address>:<port>`, replacing `<your-ipv4-address>` with your actual IPv4 address and `<port>` with the port number specified in your server configuration.
+7. **Connect to the game:**
+    - Open your web browser and navigate to `https://<your-ipv4-address>:<port>`, replacing `<your-ipv4-address>` with your actual IPv4 address and `<port>` with the port number specified in your server configuration.
+
+## Security
+
+This project is secured by the usage of OpenSSL for generating SSL certificates and IP-based filtering to restrict access to the game.
 
 ## Usage
 
