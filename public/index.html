@@ -10,8 +10,8 @@
 
 <body>
     <div id="game-container">
-        <h1>Tic Tac Toe</h1>
-        <div id="scoreboard">X: 0 | O: 0 | Games Played: 0</div>
+        <h1 style="color:white">Tic Tac Toe</h1>
+        <div id="scoreboard" style="color:white">X: 0 | O: 0 | Games Played: 0</div>
         <div id="board">
             <div class="cell" data-index="0"></div>
             <div class="cell" data-index="1"></div>
@@ -23,13 +23,13 @@
             <div class="cell" data-index="7"></div>
             <div class="cell" data-index="8"></div>
         </div>
-        <div id="chat">
+        <div id="chat" >
             <ul id="messages"></ul>
-            <input id="chat-input" placeholder="Type a message...">
+            <input id="chat-input" placeholder="Type a message..." style="color:black">
             <button id="send-btn">Send</button>
         </div>
+        <button id="restart-btn">Restart Game</button>
     </div>
-    <script src="/socket.io/socket.io.js"></script>
     <script src="game.js"></script>
 </body>
 

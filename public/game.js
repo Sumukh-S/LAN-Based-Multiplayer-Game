@@ -1,52 +1,98 @@
-const socket = io();
+const ws = new WebSocket('https://192.168.56.1:3000/'); // Replace <YOUR_SERVER_IP> with your server's IP addressReplace <YOUR_SERVER_IP> with your server's IP address
 
-const cells = document.querySelectorAll(".cell");
-const scoreboard = document.getElementById("scoreboard");
-const chatInput = document.getElementById("chat-input");
-const sendBtn = document.getElementById("send-btn");
-const messages = document.getElementById("messages");
+let messagesMemory = [];
 
-let playerSymbol = "X"; // Default player
+ws.onopen = () => {
+    console.log('Connected to the server');
+    // Send authentication message
+    ws.send(JSON.stringify({ type: 'auth', password: 'securePassword123' }));
+};
 
-cells.forEach(cell => {
-    cell.addEventListener("click", () => {
-        const index = cell.getAttribute("data-index");
-        socket.emit("makeMove", { index });
-    });
-});
+ws.onmessage = (event) => {
+    const data = JSON.parse(event.data);
 
-sendBtn.addEventListener("click", () => {
-    const message = chatInput.value.trim();
-    if (message) {
-        socket.emit("chatMessage", message);
-        chatInput.value = "";
+    if (data.type === 'auth') {
+        if (data.status === 'success') {
+            console.log('Authentication successful');
+        } else {
+            console.log('Authentication failed');
+            ws.close();
+        }
+    } else if (data.type === 'update') {
+        updateGame(data.gameState, data.scores, data.gamesPlayed, data.winner);
+    } else if (data.type === 'chatMessage') {
+        addChatMessage(data.message);
+    } else if (data.type === 'clearMessages') {
+        clearMessages();
     }
-});
+};
 
-socket.on("init", ({ gameState, scores, gamesPlayed }) => {
-    updateBoard(gameState);
-    updateScore(scores, gamesPlayed);
-});
+ws.onclose = () => {
+    console.log('Disconnected from the server');
+};
 
-socket.on("update", ({ gameState, scores, gamesPlayed, winner }) => {
-    updateBoard(gameState);
-    updateScore(scores, gamesPlayed);
-    if (winner) alert(`${winner} wins this round!`);
-});
-
-socket.on("chatMessage", (message) => {
-    const li = document.createElement("li");
-    li.textContent = message;
-    messages.appendChild(li);
-});
-
-function updateBoard(gameState) {
-    cells.forEach((cell, index) => {
-        cell.textContent = gameState[index];
-        cell.classList.remove("winning-cell");
+document.querySelectorAll('.cell').forEach(cell => {
+    cell.addEventListener('click', () => {
+        const index = cell.getAttribute('data-index');
+        ws.send(JSON.stringify({ type: 'makeMove', index }));
     });
+});
+
+document.getElementById('send-btn').addEventListener('click', sendMessage);
+document.getElementById('restart-btn').addEventListener('click', restartGame);
+
+function sendMessage() {
+    const message = document.getElementById('chat-input').value;
+    ws.send(JSON.stringify({ type: 'chatMessage', message }));
+    document.getElementById('chat-input').value = '';
 }
 
-function updateScore(scores, gamesPlayed) {
-    scoreboard.textContent = `X: ${scores.X} | O: ${scores.O} | Games Played: ${gamesPlayed}`;
+function updateGame(gameState, scores, gamesPlayed, winner) {
+    document.querySelectorAll('.cell').forEach((cell, index) => {
+        cell.textContent = gameState[index];
+    });
+    document.getElementById('scoreboard').textContent = `X: ${scores.X} | O: ${scores.O} | Games Played: ${gamesPlayed}`;
+    if (winner) {
+        showNotification(`${winner} wins!`);
+        animateWinningCells();
+    }
+}
+
+function addChatMessage(message) {
+    const messages = document.getElementById('messages');
+    const li = document.createElement('li');
+    li.textContent = message;
+    messages.appendChild(li);
+    messagesMemory.push(message);
+}
+
+function clearMessages() {
+    document.getElementById('messages').innerHTML = '';
+    messagesMemory = [];
+}
+
+function showNotification(message) {
+    const notification = document.createElement('div');
+    notification.className = 'notification';
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+
+function animateWinningCells() {
+    document.querySelectorAll('.cell').forEach(cell => {
+        cell.classList.add('winning-cell');
+    });
+    setTimeout(() => {
+        document.querySelectorAll('.cell').forEach(cell => {
+            cell.classList.remove('winning-cell');
+        });
+    }, 3000);
+}
+
+function restartGame() {
+    ws.send(JSON.stringify({ type: 'restartGame' }));
+    clearMessages();
 }
